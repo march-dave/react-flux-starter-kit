@@ -15,10 +15,11 @@ var config = {
 	paths: {
 		html: './src/*.html',
 		js: './src/**/*.js',
-		images: './src/images/*.js',
+		images: './src/images/*',
 		css: [
       		'node_modules/bootstrap/dist/css/bootstrap.min.css',
-      		'node_modules/bootstrap/dist/css/bootstrap-theme.min.css'
+      		'node_modules/bootstrap/dist/css/bootstrap-theme.min.css',
+      		'node_modules/toastr/toastr.css'
     	],
 		dist: './dist',
 		mainJs: './src/main.js'
@@ -62,13 +63,16 @@ gulp.task('css', function() {
 		.pipe(gulp.dest(config.paths.dist + '/css'));
 });
 
-gulp.task('images', function() {
-	gulp.src(config.paths.images)
-		.pipe(gulp.dest(config.paths.dist + '/images'))
-		.pipe(connect.reload());
+// Migrates images to dist folder
+// Note that I could even optimize my images here
+gulp.task('images', function () {
+    gulp.src(config.paths.images)
+        .pipe(gulp.dest(config.paths.dist + '/images'))
+        .pipe(connect.reload());
 
-	gulp.src('./src/favicon.ico')
-		.pipe(gulp.dest(config.paths.dist));
+    //publish favicon
+    gulp.src('./src/favicon.ico')
+        .pipe(gulp.dest(config.paths.dist));
 });
 
 gulp.task('lint', function() {
