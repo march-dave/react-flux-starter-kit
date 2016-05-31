@@ -45446,30 +45446,30 @@ var _clone = function(item) {
 
 var AuthorApi = {
 	getAllAuthors: function() {
-		return _clone(authors);
+		return _clone(authors); 
 	},
 
 	getAuthorById: function(id) {
 		var author = _.find(authors, {id: id});
 		return _clone(author);
 	},
-
+	
 	saveAuthor: function(author) {
 		//pretend an ajax call to web api is made here
 		console.log('Pretend this just saved the author to the DB via AJAX call...');
-
+		
 		if (author.id) {
-			var existingAuthorIndex = _.indexOf(authors, _.find(authors, {id: author.id}));
+			var existingAuthorIndex = _.indexOf(authors, _.find(authors, {id: author.id})); 
 			authors.splice(existingAuthorIndex, 1, author);
 		} else {
 			//Just simulating creation here.
 			//The server would generate ids for new authors in a real app.
 			//Cloning so copy returned is passed by value rather than by reference.
 			author.id = _generateId(author);
-			authors.push(author);
+			authors.push(_clone(author));
 		}
 
-		return _clone(author);
+		return author;
 	},
 
 	deleteAuthor: function(id) {
@@ -45482,21 +45482,21 @@ module.exports = AuthorApi;
 
 },{"./authorData":160,"lodash":3}],160:[function(require,module,exports){
 module.exports = {
-	authors:
+	authors: 
 	[
 		{
-			id: 'cory-house',
-			firstName: 'Cory',
+			id: 'cory-house', 
+			firstName: 'Cory', 
 			lastName: 'House'
-		},
+		},	
 		{
-			id: 'scott-allen',
-			firstName: 'Scott',
+			id: 'scott-allen', 
+			firstName: 'Scott', 
 			lastName: 'Allen'
-		},
+		},	
 		{
-			id: 'dan-wahlin',
-			firstName: 'Dan',
+			id: 'dan-wahlin', 
+			firstName: 'Dan', 
 			lastName: 'Wahlin'
 		}
 	]
@@ -45508,25 +45508,25 @@ module.exports = {
 var React = require('react');
 
 var About = React.createClass({displayName: "About",
-  render: function() {
-      return (
-        React.createElement("div", null, 
-          React.createElement("h1", null, "About"), 
-          React.createElement("p", null, 
-            "This application uses the following technologies:", 
-              React.createElement("ul", null, 
-                React.createElement("li", null, "React"), 
-                React.createElement("li", null, "React Router"), 
-                React.createElement("li", null, "Flux"), 
-                React.createElement("li", null, "Node"), 
-                React.createElement("li", null, "Gulp"), 
-                React.createElement("li", null, "Browserify"), 
-                React.createElement("li", null, "Boostrap")
-              )
-          )
-        )
-      );
-  }
+	render: function () {
+		return (
+			React.createElement("div", null, 
+				React.createElement("h1", null, "About"), 
+				React.createElement("p", null, 
+					"This application uses the following technologies:", 
+					React.createElement("ul", null, 
+						React.createElement("li", null, "React"), 
+						React.createElement("li", null, "React Router"), 
+						React.createElement("li", null, "Flux"), 
+						React.createElement("li", null, "Node"), 
+						React.createElement("li", null, "Gulp"), 
+						React.createElement("li", null, "Browserify"), 
+						React.createElement("li", null, "Bootstrap")
+					)
+				)
+			)
+		); 
+	}
 });
 
 module.exports = About;
@@ -45535,103 +45535,152 @@ module.exports = About;
 "use strict";
 
 var React = require('react');
-var AuthorApi = require('../../api/authorApi');
 
-var Authors = React.createClass({displayName: "Authors",
-    render: function() {
-      return (
-        React.createElement("div", null, 
-            React.createElement("h1", null, "Authors")
-        )
-    );
-    }
+var AuthorList = React.createClass({displayName: "AuthorList",
+	propTypes: {
+		authors: React.PropTypes.array.isRequired
+	},
+
+	render: function() {
+		var createAuthorRow = function(author) {
+			return (
+				React.createElement("tr", {key: author.id}, 
+					React.createElement("td", null, React.createElement("a", {href: "/#authors/" + author.id}, author.id)), 
+					React.createElement("td", null, author.firstName, " ", author.lastName)
+				)
+			);
+		};
+
+		return (
+			React.createElement("div", null, 
+				React.createElement("table", {className: "table"}, 
+					React.createElement("thead", null, 
+						React.createElement("th", null, "ID"), 
+						React.createElement("th", null, "Name")
+					), 
+					React.createElement("tbody", null, 
+						this.props.authors.map(createAuthorRow, this)
+					)
+				)
+			)
+		);
+	}
 });
 
-},{"../../api/authorApi":159,"react":158}],163:[function(require,module,exports){
+module.exports = AuthorList;
+
+},{"react":158}],163:[function(require,module,exports){
+"use strict";
+
+var React = require('react');
+var AuthorApi = require('../../api/authorApi');
+var AuthorList = require('./authorList');
+
+var AuthorPage = React.createClass({displayName: "AuthorPage",
+	getInitialState: function() {
+		return {
+			authors: []
+		};
+	},
+
+	componentDidMount: function() {
+		if (this.isMounted()) {
+			this.setState({ authors: AuthorApi.getAllAuthors() });
+		}
+	},
+
+	render: function() {
+		return (
+			React.createElement("div", null, 
+				React.createElement("h1", null, "Authors"), 
+				React.createElement(AuthorList, {authors: this.state.authors})
+			)
+		);
+	}
+});
+
+module.exports = AuthorPage;
+
+},{"../../api/authorApi":159,"./authorList":162,"react":158}],164:[function(require,module,exports){
 "use strict";
 
 var React = require('react');
 
 var Header = React.createClass({displayName: "Header",
-  render: function() {
-      return (
-        React.createElement("nav", {className: "navbar navbar-defailt"}, 
+	render: function() {
+		return (
+        React.createElement("nav", {className: "navbar navbar-default"}, 
           React.createElement("div", {className: "container-fluid"}, 
-            React.createElement("a", {href: "/", className: "navbar-brand"}, 
-              React.createElement("img", {src: "images/Pluralsigt-log.png"})
-            ), 
-            React.createElement("ul", {className: "nav navbar-nav"}, 
-              React.createElement("li", null, React.createElement("a", {href: "/"}, "Home")), 
-              React.createElement("li", null, React.createElement("a", {href: "/#authors"}, "Authors")), 
-              React.createElement("li", null, React.createElement("a", {href: "/#about"}, "About"))
-            )
+              React.createElement("a", {href: "/", className: "navbar-brand"}, 
+                React.createElement("img", {src: "images/pluralsight-logo.png"})
+              ), 
+              React.createElement("ul", {className: "nav navbar-nav"}, 
+                React.createElement("li", null, React.createElement("a", {href: "/"}, "Home")), 
+                React.createElement("li", null, React.createElement("a", {href: "/#authors"}, "Authors")), 
+                React.createElement("li", null, React.createElement("a", {href: "/#about"}, "About"))
+              )
           )
         )
-      );
-  }
+		);
+	}
 });
 
 module.exports = Header;
-
-},{"react":158}],164:[function(require,module,exports){
+},{"react":158}],165:[function(require,module,exports){
 "use strict";
 
 var React = require('react');
 
 var Home = React.createClass({displayName: "Home",
-  render: function() {
-    return (
-      React.createElement("div", {className: "jumbotron"}, 
-        React.createElement("h1", null, "Pluralsigt Administrtor"), 
-        React.createElement("p", null, "React, React Router and flux~~~")
-      )
-    );
-  }
+	render: function() {
+		return (
+			React.createElement("div", {className: "jumbotron"}, 
+				React.createElement("h1", null, "Pluralsight Administration"), 
+				React.createElement("p", null, "React, React Router, and Flux for ultra-responsive web apps.")
+			)
+		);
+	}
 });
 
 module.exports = Home;
 
-},{"react":158}],165:[function(require,module,exports){
+},{"react":158}],166:[function(require,module,exports){
 $ = jQuery = require('jquery');
 var React = require('react');
 var Home = require('./components/homePage');
 var Authors = require('./components/authors/authorPage');
-
 var About = require('./components/about/aboutPage');
 var Header = require('./components/common/header');
 
 (function(win) {
-    "use strict";
-    var App = React.createClass({displayName: "App",
-      render: function() {
-          var Child;
+	"use strict";
+	var App = React.createClass({displayName: "App",
+		render: function() {
+			var Child;
 
-          switch (this.props.route) {
-            case 'about': Child = About; break;
-            case 'authors': Child = Authors; break;
-            default: Child = Home;
-          }
+			switch(this.props.route) {
+				case 'about': Child = About; break;
+				case 'authors': Child = Authors; break;
+				default: Child = Home;
+			}
 
-          return (
-            React.createElement("div", null, 
-              React.createElement(Header, null), 
-              React.createElement(Child, null)
-            )
-          );
-      }
-    });
+			return (
+				React.createElement("div", null, 
+					React.createElement(Header, null), 
+					React.createElement(Child, null)
+				)
+			);
 
-    function render() {
-      var route = window.location.hash.substr(1);
-      React.render(React.createElement(App, {route: route}), document.getElementById('app'));
-    }
+		}
+	});
 
-    window.addEventListener('hashchange', render);
-    render();
+	function render() {
+		var route = window.location.hash.substr(1);
+		React.render(React.createElement(App, {route: route}), document.getElementById('app'));
+	}
+
+	window.addEventListener('hashchange', render);
+	render();
 })(window);
-// React.render(<Home />, document.getElementById('app'));
 
-// var App = console.log('Hello world from Browserify');
-//
-// module.exports = App;
-},{"./components/about/aboutPage":161,"./components/authors/authorPage":162,"./components/common/header":163,"./components/homePage":164,"jquery":2,"react":158}]},{},[165]);
+},{"./components/about/aboutPage":161,"./components/authors/authorPage":163,"./components/common/header":164,"./components/homePage":165,"jquery":2,"react":158}]},{},[166]);
