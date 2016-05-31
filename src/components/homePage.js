@@ -1,6 +1,6 @@
-"user strict";
+"use strict";
 
-var React = require('React');
+var React = require('react');
 
 var Home = React.createClass({
   render: function() {
@@ -11,6 +11,6 @@ var Home = React.createClass({
       </div>
     );
   }
-})
+});
 
 module.exports = Home;
